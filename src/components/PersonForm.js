@@ -11,7 +11,7 @@ const PersonForm = ({
     <div>
       <form onSubmit={addPerson}>
         <div>
-          name:{' '}
+          name:
           <input
             value={newName}
             onChange={(event) => setNewName(event.target.value)}
@@ -25,7 +25,7 @@ const PersonForm = ({
           />
         </div>
         <div>
-          <button type='submit'>add</button>
+          <button type='submit'>Add</button>
         </div>
       </form>
     </div>

@@ -3,7 +3,7 @@ import React from 'react';
 const Filter = ({ newSearch, setNewSearch }) => {
   return (
     <div>
-      filter shown with:
+      filter shown with:{' '}
       <input
         value={newSearch}
         onChange={(event) => setNewSearch(event.target.value)}
