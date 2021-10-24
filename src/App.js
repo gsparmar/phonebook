@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import Filter from './components/Filter';
 import Person from './components/Person';
 import PersonForm from './components/PersonForm';
-import axios from 'axios';
+
+import personService from './services/persons';
 
 const App = () => {
   const [persons, setPersons] = useState([]);
@@ -10,15 +11,11 @@ const App = () => {
   const [newNumber, setNewNumber] = useState('');
   const [newSearch, setNewSearch] = useState('');
 
-  const hook = () => {
-    console.log('effect');
-    axios.get('http://localhost:3001/persons').then((res) => {
-      console.log('promise fulfilled');
-      setPersons(res.data);
+  useEffect(() => {
+    personService.getAll().then((initialPersons) => {
+      setPersons(initialPersons);
     });
-  };
-
-  useEffect(hook, []);
+  }, []);
 
   const addPerson = (event) => {
     event.preventDefault();
@@ -29,16 +26,29 @@ const App = () => {
       id: persons.length + 1,
     };
 
-    if (
-      persons.find(
-        (person) => person.name.toLowerCase() === newName.toLowerCase()
-      )
-    ) {
-      alert(`${newName} is already in the phonebook.`);
-    } else {
-      setPersons(persons.concat(personObject));
-      setNewName('');
-      setNewNumber('');
+    const existingPerson = persons.find(
+      (person) => person.name.toLowerCase() === newName.toLowerCase()
+    );
+
+    if (existingPerson)
+      window.confirm(
+        `${newName} is already in the phonebook, would you like to update the number?`
+      ) &&
+        personService
+          .update(existingPerson.id, personObject)
+          .then((updatedPerson) => {
+            setPersons(
+              persons.map((person) =>
+                person.id !== existingPerson.id ? person : updatedPerson
+              )
+            );
+          });
+    else {
+      personService.create(personObject).then((newPerson) => {
+        setPersons(persons.concat(newPerson));
+        setNewName('');
+        setNewNumber('');
+      });
     }
   };
 
@@ -54,7 +64,7 @@ const App = () => {
         setNewNumber={setNewNumber}
       />
       <h2>Numbers</h2>
-      <Person persons={persons} newSearch={newSearch} />
+      <Person persons={persons} newSearch={newSearch} setPersons={setPersons} />
     </div>
   );
 };
