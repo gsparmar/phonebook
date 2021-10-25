@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Filter from './components/Filter';
 import Person from './components/Person';
 import PersonForm from './components/PersonForm';
+import './App.css';
 
 import personService from './services/persons';
 
@@ -10,12 +11,22 @@ const App = () => {
   const [newName, setNewName] = useState('');
   const [newNumber, setNewNumber] = useState('');
   const [newSearch, setNewSearch] = useState('');
+  const [errorMessage, setErrorMessage] = useState(null);
+  const [type, setType] = useState('');
 
   useEffect(() => {
     personService.getAll().then((initialPersons) => {
+      console.log('success!');
       setPersons(initialPersons);
     });
   }, []);
+
+  const Notification = ({ message, type }) => {
+    if (message === null) {
+      return null;
+    }
+    return <div className={type}>{message}</div>;
+  };
 
   const addPerson = (event) => {
     event.preventDefault();
@@ -46,6 +57,11 @@ const App = () => {
     else {
       personService.create(personObject).then((newPerson) => {
         setPersons(persons.concat(newPerson));
+        setType('addContact');
+        setErrorMessage(`Added ${newName}`);
+        setTimeout(() => {
+          setErrorMessage(null);
+        }, 1000);
         setNewName('');
         setNewNumber('');
       });
@@ -55,7 +71,10 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification message={errorMessage} type={type} />
+
       <Filter newSearch={newSearch} setNewSearch={setNewSearch} />
+      <h2>add a new contact</h2>
       <PersonForm
         addPerson={addPerson}
         newName={newName}

@@ -1,5 +1,6 @@
 import React from 'react';
 import personServices from '../services/persons';
+import '../App.css';
 
 const Person = ({ persons, newSearch, setPersons }) => {
   return (
